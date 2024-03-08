@@ -2,9 +2,12 @@
 import os
 import argparse
 import shutil
+import errno
 
 # global variable to keep track of total space cleared
 total_space_cleared = 0
+# store array of errors that we may encounter
+errors = []
 
 
 def get_directory_size(directory):
@@ -39,10 +42,13 @@ def remove_node_modules(directory):
     global total_space_cleared  # access global variable
     node_modules_path = os.path.join(directory, 'node_modules')  # store path to the node_modules folder
     if os.path.exists(node_modules_path):  # if exists then remove folder
-        node_modules_size = get_directory_size(node_modules_path)
-        shutil.rmtree(node_modules_path)  # remove node_modules folder
-        total_space_cleared += node_modules_size  # update total_space_cleared
-        print(f"removed node_modules from {directory}")  # display which root folder (react application) was cleared up
+        try:
+            node_modules_size = get_directory_size(node_modules_path)
+            shutil.rmtree(node_modules_path)  # remove node_modules folder
+            total_space_cleared += node_modules_size  # update total_space_cleared
+            print(f"removed node_modules from {directory}")  # display which root folder (react application) was cleared up
+        except PermissionError:
+            errors.append(f"Error: Permission denied to remove node_modules from {directory}")
 
 
 def scan_and_clean(root_dirs, skip_dir):
@@ -78,4 +84,10 @@ if __name__ == '__main__':
 
     # Print the total space cleared
     print(f"Total space cleared: {total_space_cleared} bytes")
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+    # Print any errors encountered
+    if errors:
+        print("\nErrors encountered:")
+        for error in errors:
+            print(error)
+
