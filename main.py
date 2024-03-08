@@ -36,42 +36,45 @@ def remove_node_modules(directory):
     Removes 'node_modules' folder from a given directory and updates the total space cleared.
     :param directory: (str) Path to directory.
     """
-    global total_space_cleared
-    node_modules_path = os.path.join(directory, 'node_modules')
-    if os.path.exists(node_modules_path):
+    global total_space_cleared  # access global variable
+    node_modules_path = os.path.join(directory, 'node_modules')  # store path to the node_modules folder
+    if os.path.exists(node_modules_path):  # if exists then remove folder
         node_modules_size = get_directory_size(node_modules_path)
-        shutil.rmtree(node_modules_path) # remove node_modules folder
-        total_space_cleared += node_modules_size
-        print(f"removed node_modules from {directory}")
+        shutil.rmtree(node_modules_path)  # remove node_modules folder
+        total_space_cleared += node_modules_size  # update total_space_cleared
+        print(f"removed node_modules from {directory}")  # display which root folder (react application) was cleared up
 
 
-def scan_and_clean(root_dir, skip_dir):
+def scan_and_clean(root_dirs, skip_dir):
     """
     Recursively scans the root directory and its subdirectories for React applications,
     skipping the directories specified in the 'skip_directories' list, and removes their node_modules folders.
     :param skip_dir: (str[]) Array of paths to skip in clean up
-    :param root_dir: (str) Path to root directory.
+    :param root_dirs: (str) Path to root directory.
     """
-    for root, dirs, files in os.walk(root_dir):
-        if any(os.path.samefile(root, os.path.abspath(directory)) for directory in skip_dir):
-            continue
-        if is_react_app(root):
-            remove_node_modules(root)
+    for root_dir in root_dirs:
+        for root, dirs, files in os.walk(root_dir):
+            # returns true if both pathname arguments refer to the same file or directory
+            if any(os.path.samefile(root, os.path.abspath(directory)) for directory in skip_dir):
+                # loops through each file/directory specified in skip directories array to compare against
+                continue
+            if is_react_app(root):
+                remove_node_modules(root)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # Create an argument parser
     parser = argparse.ArgumentParser(description="Clean up React applications")
-    parser.add_argument('directory', type=str, help='Root directory to scan')
+    parser.add_argument('directories', nargs='+', type=str, help='Root directories to scan')
     parser.add_argument('--skip', nargs='*', default=[], help='Directories or applications to skip')
     args = parser.parse_args()
 
-    root_directory = args.directory
+    root_directories = [os.path.abspath(root_dir) for root_dir in args.directories]
     # Populate the skip_directories list with the directories or applications to skip
     skip_directories = [os.path.abspath(skip_dir) for skip_dir in args.skip]
 
-    scan_and_clean(root_directory, skip_directories)
+    scan_and_clean(root_directories, skip_directories)
 
     # Print the total space cleared
     print(f"Total space cleared: {total_space_cleared} bytes")
