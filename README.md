@@ -4,14 +4,14 @@ Welcome to my simple clean up python project!
 ## What is this?
  A Python project for clearning up space on a user's drive, by removing node_modules from unused React applications
 
-****
+
 ## Features
 - **Easy to Use**: Simple GUI that i user-friendly.
 - **Effortless Cleanup**: Remove node_modules folders with just a few clicks.
 - **Customisation**: Choose specific directories or let the script search recursively through a root directory.
 - **Boost Productivity**: Spend less time managing disk space, and more time coding.
 
-****
+
 
 ## How to Use
 
