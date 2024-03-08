@@ -1,6 +1,5 @@
 # This is a Python project used to clear up node_modules folders in existing react applications
 import os
-import argparse
 import shutil
 import errno
 import logging
@@ -160,26 +159,3 @@ run_cleanup_button = tk.Button(root_tk, text="Run Cleanup", command=run_cleanup)
 run_cleanup_button.pack(pady=10)
 
 root_tk.mainloop()
-
-# Press the green button in the gutter to run the script.
-# if __name__ == '__main__':
-#     # Create an argument parser
-#     parser = argparse.ArgumentParser(description="Clean up React applications")
-#     parser.add_argument('directories', nargs='+', type=str, help='Root directories to scan')
-#     parser.add_argument('--skip', nargs='*', default=[], help='Directories or applications to skip')
-#     args = parser.parse_args()
-#
-#     root_directories = [os.path.abspath(root_dir) for root_dir in args.directories]
-#     # Populate the skip_directories list with the directories or applications to skip
-#     skip_directories = [os.path.abspath(skip_dir) for skip_dir in args.skip]
-#
-#     scan_and_clean(root_directories, skip_directories)
-#
-#     # Log the total space cleared
-#     logging.info(f"Total space cleared: {total_space_cleared} bytes")
-#
-#     # Log any errors encountered
-#     if errors:
-#         logging.info("\nErrors encountered:")
-#         for error in errors:
-#             logging.error(error)
