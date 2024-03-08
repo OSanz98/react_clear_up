@@ -3,11 +3,16 @@ import os
 import argparse
 import shutil
 import errno
+import logging
+from tqdm import tqdm
 
 # global variable to keep track of total space cleared
 total_space_cleared = 0
 # store array of errors that we may encounter
 errors = []
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 def get_directory_size(directory):
@@ -46,7 +51,7 @@ def remove_node_modules(directory):
             node_modules_size = get_directory_size(node_modules_path)
             shutil.rmtree(node_modules_path)  # remove node_modules folder
             total_space_cleared += node_modules_size  # update total_space_cleared
-            print(f"removed node_modules from {directory}")  # display which root folder (react application) was cleared up
+            logging.info(f"Removed node_modules from {directory}")
         except PermissionError:
             errors.append(f"Error: Permission denied to remove node_modules from {directory}")
 
@@ -58,6 +63,7 @@ def scan_and_clean(root_dirs, skip_dir):
     :param skip_dir: (str[]) Array of paths to skip in clean up
     :param root_dirs: (str) Path to root directory.
     """
+    react_apps_found = []
     for root_dir in root_dirs:
         for root, dirs, files in os.walk(root_dir):
             # returns true if both pathname arguments refer to the same file or directory
@@ -65,7 +71,13 @@ def scan_and_clean(root_dirs, skip_dir):
                 # loops through each file/directory specified in skip directories array to compare against
                 continue
             if is_react_app(root):
-                remove_node_modules(root)
+                react_apps_found.append(root)
+
+    progress_bar = tqdm(total=len(react_apps_found), unit='app', desc='Cleaning React apps')
+    for app_path in react_apps_found:
+        remove_node_modules(app_path)
+        progress_bar.update(1)
+    progress_bar.close()
 
 
 # Press the green button in the gutter to run the script.
@@ -83,11 +95,10 @@ if __name__ == '__main__':
     scan_and_clean(root_directories, skip_directories)
 
     # Print the total space cleared
-    print(f"Total space cleared: {total_space_cleared} bytes")
+    logging.info(f"Total space cleared: {total_space_cleared} bytes")
 
     # Print any errors encountered
     if errors:
-        print("\nErrors encountered:")
+        logging.info("\nErrors encountered:")
         for error in errors:
-            print(error)
-
+            logging.error(error)
